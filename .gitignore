@@ -31,3 +31,5 @@ publish/
 
 # EF Core generated files
 Migrations/*.Designer.cs
+
+appsettings.Development.json
