@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TuitionManagement.BusinessLogic\TuitionManagement.BusinessLogic.csproj" />
     <ProjectReference Include="..\TuitionManagement.Data\TuitionManagement.Data.csproj" />
   </ItemGroup>
 

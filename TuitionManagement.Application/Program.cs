@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using TuitionManagement.BusinessLogic.Interfaces;
+using TuitionManagement.BusinessLogic.Services;
 using TuitionManagement.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,9 @@ builder.Services.AddControllers();
 
 // Add Db Context
 builder.Services.AddDbContext<ApplicationDbContext>((options) => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add other services
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 var app = builder.Build();
 

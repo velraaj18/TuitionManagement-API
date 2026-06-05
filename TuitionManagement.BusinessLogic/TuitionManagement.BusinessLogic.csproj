@@ -10,4 +10,9 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TuitionManagement.Common\TuitionManagement.Common.csproj" />
+    <ProjectReference Include="..\TuitionManagement.Data\TuitionManagement.Data.csproj" />
+  </ItemGroup>
+
 </Project>
