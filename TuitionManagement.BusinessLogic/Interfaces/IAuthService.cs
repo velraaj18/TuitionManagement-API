@@ -5,6 +5,7 @@ namespace TuitionManagement.BusinessLogic.Interfaces
 {
     public interface IAuthService
     {
-        Task<APIResponse<string>> RegisterUser(CreateUserRequest request);
+        Task<APIResponse<string>> RegisterUser(CreateRegisterRequest request);
+        Task<APIResponse<GetLoginResponse>> Login(CreateLoginRequest request);
     }
 }

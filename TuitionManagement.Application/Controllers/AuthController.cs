@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TuitionManagement.BusinessLogic.Interfaces;
@@ -14,17 +15,32 @@ namespace TuitionManagement.Application.Controllers
     {
         private readonly IAuthService _authservice;
 
-        public AuthController (IAuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authservice = authService;
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<APIResponse<string>> Register(CreateUserRequest req)
+        public async Task<APIResponse<string>> Register(CreateRegisterRequest req)
         {
             var result = await _authservice.RegisterUser(req);
             return result;
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<APIResponse<GetLoginResponse>> Login(CreateLoginRequest request)
+        {
+            var result = await _authservice.Login(request);
+            return result;
+        }
+
+        [Authorize]
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Ok("Authorized");
         }
     }
 }
