@@ -4,6 +4,7 @@ using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
 using TuitionManagement.Data;
 using TuitionManagement.Data.Models;
+using TuitionManagement.Data.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFramework
 
 // Add other services
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
+
+// Seeding
+using(var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleSeeder.SeedRolesAsync(roleManager);
+};
 
 // Configure the HTTP request pipeline.
 
