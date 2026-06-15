@@ -156,7 +156,7 @@ namespace TuitionManagement.BusinessLogic.Services
             return token;
         }
 
-        private string GenerateRefreshToken()
+        private static string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
