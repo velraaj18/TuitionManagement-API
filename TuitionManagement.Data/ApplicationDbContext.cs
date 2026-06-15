@@ -17,5 +17,6 @@ namespace TuitionManagement.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<BatchSchedule> BatchSchedules { get; set; }
         public DbSet<StudentBatch> StudentBatches { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }

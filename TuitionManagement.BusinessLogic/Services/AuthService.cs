@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TuitionManagement.BusinessLogic.Interfaces;
@@ -16,10 +17,12 @@ namespace TuitionManagement.BusinessLogic.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JwtSettings _jwtSettings;
-        public AuthService(UserManager<ApplicationUser> userManager, IOptions<JwtSettings> jwtSettings)
+        private readonly ApplicationDbContext _db;
+        public AuthService(UserManager<ApplicationUser> userManager, IOptions<JwtSettings> jwtSettings, ApplicationDbContext db)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
+            _db = db;
         }
 
         public async Task<APIResponse<string>> RegisterUser(CreateRegisterRequest request)
@@ -79,25 +82,55 @@ namespace TuitionManagement.BusinessLogic.Services
 
             var jwtToken = GenerateJwtToken(user, userRoles);
 
+            var refreshToken = await CreateRefreshToken(user);
+
             var response = new GetLoginResponse
             {
-                JwtToken = jwtToken
+                JwtToken = jwtToken,
+                RefreshToken = refreshToken
             };
 
-            // Todo : Need to create refresh token also.
+            return new APIResponse<GetLoginResponse>() { Data = response, Message = "Login Successful", StatusCode = APIStatusCodes.Success };
+        }
 
-            return new APIResponse<GetLoginResponse>(){Data = response, Message= "Login Successful", StatusCode = APIStatusCodes.Success};
+        public async Task<APIResponse<GetLoginResponse>> Refresh(CreateRefreshTokenRequest request)
+        {
+            if (request == null)
+            {
+                return new APIResponse<GetLoginResponse>() { Data = new GetLoginResponse(), Message = "Request Cannot be null", StatusCode = APIStatusCodes.BadRequest };
+            }
+
+            var response = await _db.RefreshTokens.Include(x => x.User).FirstOrDefaultAsync(x => x.Token == request.RefreshToken);
+            if (response == null || response.IsRevoked || response.ExpiresAt <= DateTime.UtcNow)
+            {
+                return new APIResponse<GetLoginResponse>() { Data = new GetLoginResponse(), Message = "Refresh Token expired/revoked/notfound", StatusCode = APIStatusCodes.BadRequest };
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(response.User);
+            var token = GenerateJwtToken(response.User, userRoles);
+
+            // revoke and rotate the refresh token
+            response.IsRevoked = true;
+            var refreshToken = await CreateRefreshToken(response.User);
+
+            var finalResponse = new GetLoginResponse
+            {
+                JwtToken = token,
+                RefreshToken = refreshToken
+            };
+
+            return new APIResponse<GetLoginResponse>() { Data = finalResponse, Message = "Success", StatusCode = APIStatusCodes.Success };
         }
 
         private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
         {
-            var  claims = new List<Claim>{
+            var claims = new List<Claim>{
                 new(ClaimTypes.NameIdentifier, user.Id),
                 new(ClaimTypes.Email, user.Email!),
                 new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
             };
 
-            foreach(var role in roles)
+            foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
@@ -111,16 +144,46 @@ namespace TuitionManagement.BusinessLogic.Services
             // Step 3: generate token using issuer, audience, claims, expiry and signing cred
             var securityToken = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
-                audience : _jwtSettings.Audience,
-                claims : claims,
-                expires : DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-                signingCredentials : signingCredentials
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+                signingCredentials: signingCredentials
             );
 
             // Step 4: convert the JwtSecurityToken object into string token
             var token = new JwtSecurityTokenHandler().WriteToken(securityToken);
 
             return token;
+        }
+
+        private string GenerateRefreshToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        }
+
+        private async Task<string> CreateRefreshToken(ApplicationUser user)
+        {
+            var refreshToken = GenerateRefreshToken();
+
+            var existingTokens = await _db.RefreshTokens.Where(x => x.UserId == user.Id && !x.IsRevoked).ToListAsync();
+
+            foreach (var token in existingTokens)
+            {
+                token.IsRevoked = true;
+            }
+            var refreshTokenReq = new RefreshToken
+            {
+                Token = refreshToken,
+                CreatedAt = DateTime.UtcNow,
+                IsRevoked = false,
+                UserId = user.Id,
+                ExpiresAt = DateTime.UtcNow.AddDays(15)
+            };
+
+            _db.RefreshTokens.Add(refreshTokenReq);
+            await _db.SaveChangesAsync();
+
+            return refreshToken;
         }
     }
 }

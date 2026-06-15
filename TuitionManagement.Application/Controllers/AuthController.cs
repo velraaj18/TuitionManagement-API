@@ -36,7 +36,7 @@ namespace TuitionManagement.Application.Controllers
             return result;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet("test")]
         public IActionResult Test()
         {
