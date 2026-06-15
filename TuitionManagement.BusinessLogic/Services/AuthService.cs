@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Identity;
+using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.Common.DTOs;
 using TuitionManagement.Data;
 using TuitionManagement.Data.Models;
 
 namespace TuitionManagement.BusinessLogic.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
-        private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
-        public AuthService (ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+        public AuthService (UserManager<ApplicationUser> userManager)
         {
-            _db = db;
             _userManager = userManager;
         }
 
@@ -30,11 +29,20 @@ namespace TuitionManagement.BusinessLogic.Services
                 Email = request.Email,
             };
 
-            var result = _userManager.CreateAsync(user, request.Password);
+            var userResult = await _userManager.CreateAsync(user, request.Password);
 
-            if (!result.IsCompletedSuccessfully)
+            if (!userResult.Succeeded)
             {
-                return new APIResponse<string>(){Data = "", Message= "Error", StatusCode = APIStatusCodes.BadRequest};
+                var errors = string.Join(", ", userResult.Errors.Select(e => e.Description));
+                return new APIResponse<string>(){Data = "", Message= errors, StatusCode = APIStatusCodes.BadRequest};
+            }
+
+            var userRole = await _userManager.AddToRoleAsync(user, "Student");
+
+            if (!userRole.Succeeded)
+            {
+                var errors = string.Join(", ", userRole.Errors.Select(e => e.Description));
+                return new APIResponse<string>(){Data = "", Message= errors, StatusCode = APIStatusCodes.BadRequest};
             }
 
             return new APIResponse<string>(){Data = "Success", Message= "Success", StatusCode = APIStatusCodes.Success};

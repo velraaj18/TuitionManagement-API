@@ -1,6 +1,9 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using TuitionManagement.BusinessLogic.Interfaces;
+using TuitionManagement.BusinessLogic.Services;
+using TuitionManagement.Common.DTOs;
 using TuitionManagement.Data.Models;
 
 namespace TuitionManagement.Application.Controllers
@@ -9,18 +12,19 @@ namespace TuitionManagement.Application.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthService _authservice;
 
-        public AuthController (UserManager<ApplicationUser> userManager)
+        public AuthController (IAuthService authService)
         {
-            _userManager = userManager;
+            _authservice = authService;
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register()
+        public async Task<APIResponse<string>> Register(CreateUserRequest req)
         {
-            return Ok();
+            var result = await _authservice.RegisterUser(req);
+            return result;
         }
     }
 }
