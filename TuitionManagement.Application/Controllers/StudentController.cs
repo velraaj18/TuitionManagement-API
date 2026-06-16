@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
+using TuitionManagement.Common.DTOs;
 
 namespace TuitionManagement.Application.Controllers
 {
@@ -18,6 +20,21 @@ namespace TuitionManagement.Application.Controllers
         {
             var response = await _service.GetAllStudents();
             return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<APIResponse<StudentDetailResponse>> GetStudentById(int studentId)
+        {
+            var response = await _service.GetStudentById(studentId);
+            return response;
+        }
+
+        [HttpPost]
+        public async Task<APIResponse<StudentDetailResponse>> CreateStudent(CreateStudentRequest req)
+        {
+            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+            var response = await _service.CreateStudent(req, userName);
+            return response;
         }
     }
 }

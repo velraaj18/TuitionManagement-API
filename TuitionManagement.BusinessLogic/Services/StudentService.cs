@@ -56,22 +56,26 @@ namespace TuitionManagement.BusinessLogic.Services
             return new APIResponse<StudentDetailResponse?>() { StatusCode = APIStatusCodes.Success, Data = response, Message = "Student records retrieved successfully" };
         }
 
-        public async Task<APIResponse<StudentResponse>> CreateStudent(CreateStudentRequest req, string userName)
+        public async Task<APIResponse<StudentDetailResponse?>> CreateStudent(CreateStudentRequest req, string userName)
         {
             if (req == null)
             {
-                return new APIResponse<StudentResponse>() { StatusCode = APIStatusCodes.BadRequest, Data = null, Message = "Request Cannot be null" };
+                return new APIResponse<StudentDetailResponse?>() { StatusCode = APIStatusCodes.BadRequest, Data = null, Message = "Request Cannot be null" };
             }
-
-
 
             var student = new Student
             {
                 StudentName = req.StudentName,
                 EmailAddress = req.EmailAddress,
                 PhoneNumber = req.PhoneNumber,
-                DateCreated = DateTime.UtcNow
+                DateCreated = DateTime.UtcNow,
+                CreatedBy = userName,
             };
+
+            _db.Students.Add(student);
+            await _db.SaveChangesAsync();
+
+            return await GetStudentById(student.StudentUID);
         }
     }
 }
