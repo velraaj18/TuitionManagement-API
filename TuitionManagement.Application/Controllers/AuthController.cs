@@ -1,11 +1,8 @@
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TuitionManagement.BusinessLogic.Interfaces;
-using TuitionManagement.BusinessLogic.Services;
 using TuitionManagement.Common.DTOs;
-using TuitionManagement.Data.Models;
 
 namespace TuitionManagement.Application.Controllers
 {
@@ -33,6 +30,14 @@ namespace TuitionManagement.Application.Controllers
         public async Task<APIResponse<GetLoginResponse>> Login(CreateLoginRequest request)
         {
             var result = await _authservice.Login(request);
+            return result;
+        }
+
+        [HttpPost]
+        [Route("refreshToken")]
+        public async Task<APIResponse<GetLoginResponse>> RefreshToken(CreateRefreshTokenRequest req)
+        {
+            var result = await _authservice.Refresh(req);
             return result;
         }
 

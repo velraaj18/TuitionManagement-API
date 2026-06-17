@@ -7,5 +7,6 @@ namespace TuitionManagement.BusinessLogic.Interfaces
     {
         Task<APIResponse<string>> RegisterUser(CreateRegisterRequest request);
         Task<APIResponse<GetLoginResponse>> Login(CreateLoginRequest request);
+        Task<APIResponse<GetLoginResponse>> Refresh(CreateRefreshTokenRequest request);
     }
 }
