@@ -93,9 +93,16 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// Add CORS policy to allow front end
+builder.Services.AddCors(options => options.AddPolicy("AllowFrontend", policy =>
+{
+    policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyOrigin();
+}));
+
 var app = builder.Build();
 
 // Seeding
+// usually each service needs a scope to run on since seeding is running when the application is building we are creating a scope manually
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -110,8 +117,10 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
+
+// Cors must be after the HTTP request pipeline
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
