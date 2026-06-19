@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
@@ -30,6 +31,7 @@ namespace TuitionManagement.Application.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<APIResponse<StudentDetailResponse>> CreateStudent(CreateStudentRequest req)
         {
             var userName = User.FindFirst(ClaimTypes.Name)?.Value;

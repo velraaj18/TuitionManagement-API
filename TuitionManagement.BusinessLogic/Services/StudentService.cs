@@ -40,6 +40,10 @@ namespace TuitionManagement.BusinessLogic.Services
                 StudentUID = x.StudentUID,
                 PhoneNumber = x.PhoneNumber,
                 EmailAddress = x.EmailAddress,
+                DateCreated = x.DateCreated,
+                DateModified = x.DateModified,
+                CreatedBy = x.CreatedBy,
+                ModifiedBy = x.ModifiedBy,
                 Batches = x.StudentBatches.Select(x => new StudentBatchResponse
                 {
                     BatchName = x.Batch.BatchName,
