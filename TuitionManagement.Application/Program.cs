@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using TuitionManagement.Application.HttpServices;
 using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
 using TuitionManagement.Common.DTOs;
@@ -61,6 +62,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Add custom services
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IClaimsService, ClaimsService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

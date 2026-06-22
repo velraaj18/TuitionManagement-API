@@ -17,13 +17,15 @@ namespace TuitionManagement.Application.Controllers
             _service = service;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var response = await _service.GetAllStudents();
             return Ok(response);
         }
 
-        [HttpGet]
+        [HttpGet("{studentId}")]
+        [Authorize]
         public async Task<APIResponse<StudentDetailResponse>> GetStudentById(int studentId)
         {
             var response = await _service.GetStudentById(studentId);

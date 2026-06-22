@@ -1,21 +1,18 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TuitionManagement.Data.Models
+namespace TuitionManagement.Common.DTOs
 {
-    public class Teacher : BaseAuditEntity
+    public class CreateTeacherRequest
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int TeacherUID { get; set; }
-
+        public int? TeacherUID { get; set; }
+        
         [Required]
         [StringLength(100)]
         public string TeacherName { get; set; }
 
+        [Required]
         [Phone]
         [StringLength(10)]
-        [Required]
         public string PhoneNumber { get; set; }
 
         [EmailAddress]
@@ -25,7 +22,7 @@ namespace TuitionManagement.Data.Models
         [StringLength(50)]
         public string Qualification { get; set; }
 
+        [Range(0, 50)]
         public int Experience { get; set; }
-        public ICollection<BatchSchedule> BatchSchedules { get; set; }
     }
 }
