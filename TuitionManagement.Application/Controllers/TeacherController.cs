@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
@@ -17,6 +18,7 @@ namespace TuitionManagement.Application.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<APIResponse<List<GetTeacherResponse>>> GetTeachers()
         {
             var response = await _service.GetAllTeachers();
@@ -25,6 +27,7 @@ namespace TuitionManagement.Application.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize]
         public async Task<APIResponse<GetTeacherDetailResponse>> GetTeacherById(int id)
         {
             var response = await _service.GetTeacherById(id);
@@ -32,6 +35,7 @@ namespace TuitionManagement.Application.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<APIResponse<GetTeacherDetailResponse>> CreateTeacher(CreateTeacherRequest req)
         {
             var response = await _service.CreateTeacher(req);
