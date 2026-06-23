@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
 using TuitionManagement.Common.DTOs;
 
@@ -9,9 +10,9 @@ namespace TuitionManagement.Application.Controllers
     [Route("api/[controller]")]
     public class SubjectController : ControllerBase
     {
-        private readonly SubjectService _service;
+        private readonly ISubjectService _service;
 
-        public SubjectController(SubjectService service)
+        public SubjectController(ISubjectService service)
         {
             _service = service;
         }
