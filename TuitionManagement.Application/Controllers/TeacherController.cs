@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using TuitionManagement.BusinessLogic.Interfaces;
 using TuitionManagement.BusinessLogic.Services;
 using TuitionManagement.Common.DTOs;
 
@@ -9,8 +10,8 @@ namespace TuitionManagement.Application.Controllers
     [Route("api/[controller]")]
     public class TeacherController : ControllerBase
     {
-        private readonly TeacherService _service;
-        public TeacherController(TeacherService service)
+        private readonly ITeacherService _service;
+        public TeacherController(ITeacherService service)
         {
             _service = service;
         }
