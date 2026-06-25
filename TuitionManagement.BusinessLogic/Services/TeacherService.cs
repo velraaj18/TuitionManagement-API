@@ -38,12 +38,12 @@ namespace TuitionManagement.BusinessLogic.Services
             return new APIResponse<List<GetTeacherResponse>>() { StatusCode = APIStatusCodes.Success, Data = teachers, Message = "Retrieved Successfully" };
         }
 
-        public async Task<APIResponse<GetTeacherDetailResponse>> CreateTeacher(CreateTeacherRequest req)
+        public async Task<APIResponse<GetTeacherDetailResponse?>> CreateTeacher(CreateTeacherRequest req)
         {
             var userName = _claimsService.GetUserName();
             if (req == null)
             {
-                return new APIResponse<GetTeacherDetailResponse>() { StatusCode = APIStatusCodes.BadRequest, Data = new GetTeacherDetailResponse(), Message = "Request Cannot be null" };
+                return new APIResponse<GetTeacherDetailResponse?>() { StatusCode = APIStatusCodes.BadRequest, Data = null, Message = "Request Cannot be null" };
             }
 
             var teacher = new Teacher
@@ -62,7 +62,7 @@ namespace TuitionManagement.BusinessLogic.Services
             return await GetTeacherById(teacher.TeacherUID);
         }
 
-        public async Task<APIResponse<GetTeacherDetailResponse>> GetTeacherById(int id)
+        public async Task<APIResponse<GetTeacherDetailResponse?>> GetTeacherById(int id)
         {
             var teacher = await _db.Teachers
                 .Where(t => t.TeacherUID == id)
@@ -85,14 +85,14 @@ namespace TuitionManagement.BusinessLogic.Services
 
             if (teacher == null)
             {
-                return new APIResponse<GetTeacherDetailResponse>
+                return new APIResponse<GetTeacherDetailResponse?>
                 {
                     StatusCode = APIStatusCodes.NotFound,
                     Message = "Teacher not found"
                 };
             }
 
-            return new APIResponse<GetTeacherDetailResponse>
+            return new APIResponse<GetTeacherDetailResponse?>
             {
                 StatusCode = APIStatusCodes.Success,
                 Data = teacher,

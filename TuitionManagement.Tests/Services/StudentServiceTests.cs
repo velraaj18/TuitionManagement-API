@@ -5,51 +5,54 @@ using TuitionManagement.Data;
 using TuitionManagement.Data.Models;
 using Xunit;
 
-public class StudentServiceTests
+namespace TuitionManagement.Tests.Services
 {
-    private ApplicationDbContext GetDbContext()
+    public class StudentServiceTests
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-
-        return new ApplicationDbContext(options);
-    }
-
-    [Fact]
-    public async Task CreateStudent_WhenRequestIsNull_ReturnsBadRequest()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var service = new StudentService(db);
-
-        // Act
-        var result = await service.CreateStudent(null, "Velraaj");
-
-        // Assert
-        Assert.Equal(APIStatusCodes.BadRequest, result.StatusCode);
-        Assert.Null(result.Data);
-        Assert.Equal("Request Cannot be null", result.Message);
-    }
-
-    [Fact]
-    public async Task CreateStudent_WhenRequestIsValid_ReturnsSuccess()
-    {
-        // arrange
-        var db = GetDbContext();
-        var service = new StudentService(db);
-        var request = new CreateStudentRequest
+        private ApplicationDbContext GetDbContext()
         {
-            StudentName = "Velraaj",
-            EmailAddress = "test@gmail.com",
-            PhoneNumber = "1234567890",
-        };
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
 
-        // act
-        var result = await service.CreateStudent(request, "velraaj");
+            return new ApplicationDbContext(options);
+        }
 
-        // assert
-        Assert.Equal(APIStatusCodes.Success, result.StatusCode);
-        Assert.NotNull(result.Data);
+        [Fact]
+        public async Task CreateStudent_WhenRequestIsNull_ReturnsBadRequest()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var service = new StudentService(db);
+
+            // Act
+            var result = await service.CreateStudent(null, "Velraaj");
+
+            // Assert
+            Assert.Equal(APIStatusCodes.BadRequest, result.StatusCode);
+            Assert.Null(result.Data);
+            Assert.Equal("Request Cannot be null", result.Message);
+        }
+
+        [Fact]
+        public async Task CreateStudent_WhenRequestIsValid_ReturnsSuccess()
+        {
+            // arrange
+            var db = GetDbContext();
+            var service = new StudentService(db);
+            var request = new CreateStudentRequest
+            {
+                StudentName = "Velraaj",
+                EmailAddress = "test@gmail.com",
+                PhoneNumber = "1234567890",
+            };
+
+            // act
+            var result = await service.CreateStudent(request, "velraaj");
+
+            // assert
+            Assert.Equal(APIStatusCodes.Success, result.StatusCode);
+            Assert.NotNull(result.Data);
+        }
     }
 }
